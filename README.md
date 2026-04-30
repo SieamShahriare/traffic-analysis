@@ -248,10 +248,6 @@ Install with:
 pip install torch ultralytics opencv-python scikit-image PyWavelets numpy pandas matplotlib seaborn scikit-learn cvzone
 ```
 
-## License
-
-This project analyzes traffic patterns for research and operational purposes. Ensure compliance with local privacy regulations regarding video surveillance and vehicle tracking.
-
 ## Author
 
-Traffic Vision Analytics — Drone-based traffic monitoring system
+Sieam Shahriare
