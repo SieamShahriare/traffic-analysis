@@ -116,7 +116,7 @@ PCA projection of vehicle feature vectors showing the distribution of vehicles i
 
 The output video with real-time vehicle detection, tracking, and line crossing annotations:
 
-[**View Annotated Video**](./analysis/20260430_162605/annotated.mp4)
+[**View Annotated Video**](https://youtu.be/hle1LyJwCbQ?si=7KvIz4lzAMTgLQuQ)
 
 This video shows:
 
