@@ -59,71 +59,71 @@ traffic-analysis/
 
 ## Analysis Results
 
-Latest analysis session: **20260430_162605**
+Latest analysis session: **20260506_230108**
 
 ### Statistics
 
-- **Total Frames**: 518
-- **Video Duration**: 385.63 seconds (~6.4 minutes)
-- **Processing Speed**: 1.34 fps
-- **Spatial Calibration**: 21.644 pixels per meter
-- **Total Vehicles Tracked**: 21 unique vehicles
+| Metric | Value |
+|--------|-------|
+| Total Frames | 518 |
+| Video Duration | 385.63s (~6.4 min) |
+| Processing Speed | 1.34 fps |
+| Spatial Calibration | 21.644 px/m |
+| Unique Vehicles | 21 |
 
 ### Traffic Crossing Summary
 
-Line-by-line crossing counts across 10 detection lines:
-
-- Line 0: 1 crossing
-- Line 1: 1 crossing  
-- Line 2: 1 crossing
-- Line 3: 3 crossings
-- Line 4: 3 crossings
-- Line 5: 4 crossings
-- Line 6: 0 crossings (inactive)
-- Line 7: 1 crossing
-- Line 8: 4 crossings
-- Line 9: 3 crossings
-
-**Total Crossings**: 21 vehicles across all monitoring lines
+| Line | Crossings |
+|------|-----------|
+| Line 0 | 1 |
+| Line 1 | 1 |
+| Line 2 | 1 |
+| Line 3 | 3 |
+| Line 4 | 3 |
+| Line 5 | 4 |
+| Line 6 | 0 (inactive) |
+| Line 7 | 1 |
+| Line 8 | 4 |
+| Line 9 | 3 |
+| **Total** | **21** |
 
 ## Analysis Visualizations
 
 ### Panel A: Traffic Flow Analysis
 
-![Traffic Flow Analysis](./analysis/20260430_162605/plots/panel_A_flow.png)
+![Traffic Flow Analysis](./analysis/20260506_230108/plots/panel_A_flow.png)
 
-Shows cumulative vehicle counts crossing each detection line over time, revealing traffic patterns and flow intensity across different monitoring zones.
+Cumulative vehicle counts crossing each detection line over time, revealing traffic patterns and flow intensity across different monitoring zones.
 
 ### Panel B: Speed Distribution
 
-![Speed Distribution](./analysis/20260430_162605/plots/panel_B_speed.png)
+![Speed Distribution](./analysis/20260506_230108/plots/panel_B_speed.png)
 
-Visualizes the distribution of vehicle speeds across the monitored area, showing average velocities and speed variations for each detection line.
+Distribution of vehicle speeds across the monitored area, showing average velocities and speed variations per detection line.
 
 ### Panel C: Spatial Traffic Concentration
 
-![Spatial Heatmap](./analysis/20260430_162605/plots/panel_C_spatial.png)
+![Spatial Heatmap](./analysis/20260506_230108/plots/panel_C_spatial.png)
 
 Heatmap displaying traffic density and concentration patterns, revealing hotspots and traffic-prone areas within the monitored zone.
 
 ### Panel D: Feature Space Analysis
 
-![Feature Space](./analysis/20260430_162605/plots/panel_D_features.png)
+![Feature Space](./analysis/20260506_230108/plots/panel_D_features.png)
 
-PCA projection of vehicle feature vectors showing the distribution of vehicles in extracted feature space (SIFT + GLCM texture features), useful for vehicle classification and anomaly detection.
+PCA projection of vehicle feature vectors (SIFT 128-dim + GLCM 4-dim) showing vehicle distribution in extracted feature space — useful for classification and anomaly detection.
+
+### Heatmap Output
+
+![Heatmap](./analysis/20260506_230108/heatmap.png)
+
+Raw accumulated heatmap saved per session at `analysis/[session_id]/heatmap.png`.
 
 ## Annotated Video
 
-The output video with real-time vehicle detection, tracking, and line crossing annotations:
+[![Watch annotated video](https://img.youtube.com/vi/hle1LyJwCbQ/maxresdefault.jpg)](https://youtu.be/hle1LyJwCbQ?si=7KvIz4lzAMTgLQuQ)
 
-[**View Annotated Video**](https://youtu.be/hle1LyJwCbQ?si=7KvIz4lzAMTgLQuQ)
-
-This video shows:
-
-- Bounding boxes around detected vehicles
-- Unique track IDs for each vehicle
-- Detection line overlays for crossing monitoring
-- Real-time traffic flow visualization
+Real-time vehicle detection, tracking IDs, speed labels, and line crossing annotations overlaid on the original drone footage.
 
 ## Usage
 
@@ -131,29 +131,28 @@ This video shows:
 
 1. **Place your video file** at `./assets/drone-footage.mp4`
 
-2. **Run the detection and tracking**:
+2. **Run detection and tracking**:
 
    ```bash
    python infer.py
    ```
 
-   This will:
-   - Detect and track vehicles in the video
-   - Save results to a timestamped session directory
-   - Generate crossing events, speeds, and features
-   - Create an annotated output video
+   Interactive setup prompts you to:
+   - Draw counting lines on the first frame
+   - Draw a calibration line over a known real-world distance
+   - Enter the real-world length in meters
 
 3. **Generate the analytics dashboard**:
 
    ```bash
    # Auto-detect latest session
    python visualize.py
-   
-   # Or specify a session
-   python visualize.py --session 20260430_162605
-   
-   # Save plots as PNG instead of displaying
-   python visualize.py --session 20260430_162605 --save
+
+   # Specify a session
+   python visualize.py --session 20260506_230108
+
+   # Save plots as PNG
+   python visualize.py --session 20260506_230108 --save
    ```
 
 ### Configuration
@@ -161,93 +160,78 @@ This video shows:
 Edit `custom_tracker.yml` to adjust tracking parameters:
 
 ```yaml
-tracker_type: bytetrack              # Tracking algorithm
-track_high_thresh: 0.5               # Initial association threshold
-track_low_thresh: 0.1                # Secondary association threshold
-new_track_thresh: 0.6                # New track creation threshold
-track_buffer: 30                     # Frames to retain lost tracks
-match_thresh: 0.8                    # Track matching threshold
-fuse_score: True                     # Fuse detection scores with IOU
-gating_threshold: 0.8                # Distance-based filtering threshold
+tracker_type: bytetrack
+track_high_thresh: 0.5
+track_low_thresh: 0.1
+new_track_thresh: 0.6
+track_buffer: 30
+match_thresh: 0.8
+fuse_score: True
+gating_threshold: 0.8
 ```
 
-### Customizing Detection Parameters
-
-In `infer.py`, modify these constants:
+Edit constants in `infer.py`:
 
 ```python
-VIDEO_PATH      = "./assets/drone-footage.mp4"  # Input video
-MODEL_PATH      = "./models/yolo26m.pt"         # YOLO model
-VEHICLE_CLASSES = [2, 3, 5, 7]                  # Car, motorbike, bus, truck
-TRACK_HISTORY   = 30                            # Frames per track
-GRAPHCUT_EVERY  = 5                             # Graph-cut frequency
-HEATMAP_RADIUS  = 20                            # Heatmap blob size
+VIDEO_PATH      = "./assets/drone-footage.mp4"
+MODEL_PATH      = "./models/yolo26m.pt"
+VEHICLE_CLASSES = [2, 3, 5, 7]   # car, motorbike, bus, truck
+TRACK_HISTORY   = 30
+GRAPHCUT_EVERY  = 5
+HEATMAP_RADIUS  = 20
 ```
 
-## Output Formats
+## Output Files
 
-### summary.json
-
-Metadata about the analysis session including video properties, pixel-to-meter calibration, and crossing counts.
-
-### crossings.csv
-
-Detailed event log of vehicle crossings with timestamps and line IDs.
-
-### speeds.csv
-
-Speed estimates for each tracked vehicle including spatial coordinates and temporal information.
-
-### features.csv
-
-High-dimensional feature vectors for each vehicle combining:
-
-- SIFT descriptors (128-dimensional)
-- GLCM texture properties (4-dimensional)
+| File | Description |
+|------|-------------|
+| `annotated.mp4` | Output video with bounding boxes, track IDs, speed labels |
+| `summary.json` | Session metadata, calibration, per-line counts |
+| `crossings.csv` | Per-event log: timestamp, frame, track ID, line index, coords, speed |
+| `speeds.csv` | Speed estimates per vehicle per frame |
+| `features.csv` | 132-dim feature vectors (128 SIFT + 4 GLCM) per vehicle |
+| `heatmap.png` | Accumulated spatial density heatmap |
+| `plots/` | Panel A–D visualizations from `visualize.py` |
 
 ## Technical Details
 
 ### Vehicle Detection
 
-- **Model**: YOLOv8 (Medium variant for speed/accuracy balance)
+- **Model**: YOLOv8 Medium (`yolo26m.pt`)
 - **Tracked Classes**: Car (2), Motorcycle (3), Bus (5), Truck (7)
 - **Confidence Threshold**: 0.5
 
 ### Preprocessing
 
-- Wavelet denoising (Daubechies-1, level 2) for noise reduction
-- Maintains luminance channel integrity
+- Wavelet denoising (Daubechies-1, level 2) applied per frame on the luminance channel
 
-### Tracking Algorithm
+### Tracking
 
-- **ByteTrack**: Efficient multi-object tracking with Kalman filtering
-- **Association**: Hungarian algorithm with IoU and feature distance metrics
-- **Track Management**: Configurable buffer for temporary occlusions
+- **Algorithm**: ByteTrack with Kalman filtering
+- **Association**: Hungarian algorithm (IoU + feature distance)
+- **Track buffer**: 30 frames for temporary occlusion handling
+
+### Speed Estimation
+
+Pixel displacement over 10-frame windows, converted to m/s via calibration scale, then to km/h.
 
 ### Feature Extraction
 
-- **SIFT**: Rotation-invariant keypoint descriptors (128-dim)
-- **GLCM**: Gray-level co-occurrence matrix texture features
-  - Contrast, Homogeneity, Energy, Correlation
+- **SIFT**: 128-dim rotation-invariant keypoint descriptors (mean-pooled)
+- **GLCM**: Contrast, Homogeneity, Energy, Correlation
 
 ## Dependencies
 
-- Python 3.8+
-- PyTorch
-- Ultralytics YOLOv8
-- OpenCV (cv2)
-- scikit-image (for GLCM)
-- PyWavelets (pywt)
-- NumPy, Pandas
-- Matplotlib, Seaborn
-- scikit-learn (for PCA)
-
-Install with:
-
 ```bash
-pip install torch ultralytics opencv-python scikit-image PyWavelets numpy pandas matplotlib seaborn scikit-learn cvzone
+pip install torch ultralytics opencv-python scikit-image PyWavelets \
+            numpy pandas matplotlib seaborn scikit-learn cvzone
 ```
+
+- Python 3.8+
+- PyTorch (MPS / CUDA / CPU auto-detected)
+- Ultralytics YOLOv8
+- OpenCV, scikit-image, PyWavelets, cvzone
 
 ## Author
 
-Sieam Shahriare
+**Sieam Shahriare** — [github.com/SieamShahriare](https://github.com/SieamShahriare)
