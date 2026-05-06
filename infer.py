@@ -40,7 +40,7 @@ def waveletDenoise(frame):
     ycrcb = cv.cvtColor(frame, cv.COLOR_BGR2YCrCb)
     y = ycrcb[:, :, 0].astype(float)
     coeffs = pywt.wavedec2(y, wavelet="db1", level=2)
-    sigma = np.median(np.abs(coeffs[-1])) / 0.6745
+    sigma = np.median(np.abs(coeffs[-1][-1])) / 0.6745
     threshold = sigma * np.sqrt(2 * np.log(y.size))
     coeffsThres = [coeffs[0]] + [
         tuple(pywt.threshold(c, threshold, mode="soft") for c in detail)
@@ -62,8 +62,17 @@ def graph_cut_patch(img, x1, y1, w, h, margin=8):
     mask     = np.zeros(patch.shape[:2], np.uint8)
     bg_model = np.zeros((1, 65), np.float64)
     fg_model = np.zeros((1, 65), np.float64)
-    rect     = (margin, margin, max(1, w), max(1, h))
+    
+    rect_w = min(max(1, w), patch.shape[1] - margin - 1)
+    rect_h = min(max(1, h), patch.shape[0] - margin - 1)
+
+    # Prevent invalid rects if the bounding box is highly clipped
+    if rect_w <= 1 or rect_h <= 1:
+        return patch 
+
+    rect = (margin, margin, rect_w, rect_h)
     cv.grabCut(patch, mask, rect, bg_model, fg_model, 3, cv.GC_INIT_WITH_RECT)
+    
     fg = np.where((mask == cv.GC_PR_FGD) | (mask == cv.GC_FGD), 255, 0).astype(np.uint8)
     result = patch.copy()
     result[fg == 0] = 0
@@ -218,7 +227,7 @@ while True:
     # Wavelet denoising
     imgClean = waveletDenoise(img)
 
-    # YOLOv26s + ByteTrack
+    # YOLO + ByteTrack
     results = model.track(imgClean, persist=True, tracker="./custom_tracker.yml", classes=VEHICLE_CLASSES, verbose=False, device=device)
 
     if results[0].boxes.id is not None:
@@ -231,7 +240,7 @@ while True:
             y1 = cy - h // 2
 
             # Track history
-            current_time = time.time()
+            current_time = frame_count / fps
             track = track_history[track_id]
             track.append((cx, cy, current_time))
             if len(track) > TRACK_HISTORY:

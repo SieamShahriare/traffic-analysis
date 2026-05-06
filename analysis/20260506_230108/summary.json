@@ -1,0 +1,26 @@
+{
+  "session_id": "20260506_230108",
+  "video": "./assets/drone-footage.mp4",
+  "total_frames": 518,
+  "duration_sec": 402.05,
+  "fps_processed": 1.29,
+  "pixels_per_meter": 11.086,
+  "line_counts": {
+    "0": 4,
+    "1": 9,
+    "2": 6,
+    "3": 2,
+    "4": 3,
+    "5": 4,
+    "6": 1,
+    "7": 0
+  },
+  "outputs": {
+    "annotated_video": "./analysis/20260506_230108/annotated.mp4",
+    "crossings_csv": "./analysis/20260506_230108/crossings.csv",
+    "features_csv": "./analysis/20260506_230108/features.csv",
+    "speeds_csv": "./analysis/20260506_230108/speeds.csv",
+    "heatmap_png": "./analysis/20260506_230108/heatmap.png",
+    "summary_json": "./analysis/20260506_230108/summary.json"
+  }
+}
