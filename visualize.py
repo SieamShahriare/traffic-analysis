@@ -1,14 +1,3 @@
-"""
-visualize.py — Traffic Vision Analytics Dashboard
-Reads from a session directory produced by main.py and renders
-4 analytical panels covering flow, speed, spatial, and feature space.
-
-Usage:
-    python visualize.py                          # auto-picks latest session
-    python visualize.py --session 20260430_114103
-    python visualize.py --session 20260430_114103 --save  # save PNGs instead of show
-"""
-
 import argparse
 import json
 import os
@@ -56,7 +45,7 @@ line_counts   = {int(k): v for k, v in summary["line_counts"].items()}
 total_frames  = summary["total_frames"]
 fps           = summary.get("fps_processed", 30)
 
-# ─── Theme ────────────────────────────────────────────────────────────────────
+# Theme
 BG      = "#0d1117"
 PANEL   = "#161b22"
 ACCENT  = "#58a6ff"
